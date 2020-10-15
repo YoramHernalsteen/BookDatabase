@@ -83,25 +83,8 @@ public class HomeController {
                                  @RequestParam(required = false) String title,
                                  Model model) {
         if (min == null && max == null && size != null) {
-            if (size.equals("150")) {
-                min = 0;
-                max = 150;
-            } else if (size.equals("300")) {
-                min = 0;
-                max = 300;
-            } else if (size.equals("450")) {
-                min = 0;
-                max = 450;
-            } else if (size.equals("600")) {
-                min = 0;
-                max = 600;
-            } else if (size.equals("750")) {
-                min = 0;
-                max = 750;
-            } else if (size.equals("all")) {
-                min = 0;
-                max = 5000;
-            }
+                min = setMinAndMax(size)[0];
+                max = setMinAndMax(size)[1];
         }
         logger.info(String.format("interpreted: min = %d, max=%d, bookTitle=%s", min, max, title));
         model.addAttribute("min", min);
@@ -111,7 +94,29 @@ public class HomeController {
         model.addAttribute("book", bookRepository.titleAndPages(min, max, title));
         return "advancedSearch";
     }
-
+    private Integer [] setMinAndMax(String size){
+        Integer [] limits = new Integer[2];
+        if (size.equals("150")) {
+            limits[0] = 0;
+            limits[1] = 150;
+        } else if (size.equals("300")) {
+            limits[0] = 0;
+            limits[1]  = 300;
+        } else if (size.equals("450")) {
+            limits[0]= 0;
+            limits[1]  = 450;
+        } else if (size.equals("600")) {
+            limits[0] = 0;
+            limits[1]  = 600;
+        } else if (size.equals("750")) {
+            limits[0] = 0;
+            limits[1]  = 750;
+        } else if (size.equals("all")) {
+            limits[0] = 0;
+            limits[1]  = 5000;
+        }
+        return limits;
+    }
     @GetMapping("/authors")
     public String authors(@RequestParam(required = false) String author, Model model) {
         model.addAttribute("header", header);
@@ -124,6 +129,5 @@ public class HomeController {
     public String addingBooks(Model model){
         return "addingBooks";
     }
-
 
 }
