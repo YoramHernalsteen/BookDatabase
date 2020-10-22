@@ -155,7 +155,7 @@ public class AdminController {
                 authorDetails(authorName, authorKnownFor, authorInfo, author);
         }
 
-        return "redirect:/authors";
+        return "redirect:/authors"+authorID;
     }
     @GetMapping("/create-genre")
     public String createGenre(Model model){

@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -26,6 +29,7 @@ public class HomeController {
     @Autowired
     private GenreRepository genreRepository;
     private String header = "So many books, so little time.";
+    private final static Map<String, Integer> mapSize = Map.of("150", 150, "300", 300, "450", 450, "600", 600 , "750", 750, "all", 5000 );
 
     @GetMapping({"/", "/books", "/books/{genre}"})
     public String home(@PathVariable(required = false) String genre,
@@ -83,8 +87,8 @@ public class HomeController {
                                  @RequestParam(required = false) String title,
                                  Model model) {
         if (min == null && max == null && size != null) {
-                min = setMinAndMax(size)[0];
-                max = setMinAndMax(size)[1];
+                min = 0;
+                max = setMax(size);
         }
         logger.info(String.format("interpreted: min = %d, max=%d, bookTitle=%s", min, max, title));
         model.addAttribute("min", min);
@@ -94,28 +98,8 @@ public class HomeController {
         model.addAttribute("book", bookRepository.titleAndPages(min, max, title));
         return "advancedSearch";
     }
-    private Integer [] setMinAndMax(String size){
-        Integer [] limits = new Integer[2];
-        if (size.equals("150")) {
-            limits[0] = 0;
-            limits[1] = 150;
-        } else if (size.equals("300")) {
-            limits[0] = 0;
-            limits[1]  = 300;
-        } else if (size.equals("450")) {
-            limits[0]= 0;
-            limits[1]  = 450;
-        } else if (size.equals("600")) {
-            limits[0] = 0;
-            limits[1]  = 600;
-        } else if (size.equals("750")) {
-            limits[0] = 0;
-            limits[1]  = 750;
-        } else if (size.equals("all")) {
-            limits[0] = 0;
-            limits[1]  = 5000;
-        }
-        return limits;
+    private Integer setMax(String size){
+        return mapSize.get(size);
     }
 
     @GetMapping("/authors")
