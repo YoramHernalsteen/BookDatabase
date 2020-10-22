@@ -1,5 +1,4 @@
 package be.thomasmore.bookdb.controller;
-
 import be.thomasmore.bookdb.AuthorForm;
 import be.thomasmore.bookdb.BookForm;
 import be.thomasmore.bookdb.model.Author;
@@ -161,12 +160,4 @@ public class AdminController {
 
         return "redirect:/books";
     }
-
-
-
-
-
-
-
-
 }
