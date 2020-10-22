@@ -43,20 +43,24 @@ public class AdminController {
         if(!bookOptional.isPresent()){
             if(bookTitle!= null && bookAuthor!= null && bookGenre!= null ){
                 Book book = new Book();
-                book.setTitle(bookTitle);
-                if(authorOptional.isPresent()){
-                    book.setAuthor(authorOptional.get());
-                }
-                if (genreOptional.isPresent()) {
-                    book.setGenre(genreOptional.get());
-                }
-                book.setIsbn(bookIsbn);
-                book.setReadFromString(bookRead);
-                book.setPages(bookPages);
-                bookRepository.save(book);
+                bookDetails(book, bookTitle, bookIsbn, bookPages, genreOptional, authorOptional, bookRead);
             }
         }
         return "redirect:/books";
+    }
+
+    private void bookDetails(Book book, String bookTitle, String bookIsbn, int bookPages,Optional <Genre> genreOptional, Optional<Author> authorOptional, String bookRead ){
+        book.setTitle(bookTitle);
+        if(authorOptional.isPresent()){
+            book.setAuthor(authorOptional.get());
+        }
+        if (genreOptional.isPresent()) {
+            book.setGenre(genreOptional.get());
+        }
+        book.setIsbn(bookIsbn);
+        book.setReadFromString(bookRead);
+        book.setPages(bookPages);
+        bookRepository.save(book);
     }
 
     @GetMapping("/edit-book/{bookID}")
@@ -96,18 +100,7 @@ public class AdminController {
         Optional<Author> authorOptional = authorRepository.findByNameLike(bookAuthor);
         if(bookOptional.isPresent()){
             Book book = bookOptional.get();
-            book.setTitle(bookTitle);
-            book.setIsbn(bookIsbn);
-            if(genreOptional.isPresent()){
-                book.setGenre(genreOptional.get());
-            }
-            if(authorOptional.isPresent()){
-                book.setAuthor(authorOptional.get());
-            }
-
-            book.setReadFromString(bookRead);
-            book.setPages(bookPages);
-            bookRepository.save(book);
+            bookDetails(book, bookTitle, bookIsbn, bookPages, genreOptional, authorOptional, bookRead);
         }
         return "redirect:/book/"+bookID;
     }

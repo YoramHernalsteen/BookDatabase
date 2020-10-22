@@ -117,6 +117,7 @@ public class HomeController {
         }
         return limits;
     }
+
     @GetMapping("/authors")
     public String authors(@RequestParam(required = false) String author, Model model) {
         model.addAttribute("header", header);
