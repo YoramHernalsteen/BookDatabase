@@ -105,6 +105,13 @@ public class AdminController {
         return "redirect:/book/"+bookID;
     }
 
+    private void authorDetails(String authorName, String authorKnownFor, String authorInfo, Author author){
+        author.setName(authorName);
+        author.setMoreInfo(authorInfo);
+        author.setMostKnownFor(authorKnownFor);
+        authorRepository.save(author);
+    }
+
     @GetMapping("/create-author")
     public String createAuthor(Model model){
         return "admin/create-author";
@@ -118,10 +125,7 @@ public class AdminController {
         if(!authorOptional.isPresent()){
             if(authorName!= null && authorKnownFor!= null && authorInfo != null){
                 Author author = new Author();
-                author.setName(authorName);
-                author.setMoreInfo(authorInfo);
-                author.setMostKnownFor(authorKnownFor);
-                authorRepository.save(author);
+                authorDetails(authorName, authorKnownFor, authorInfo, author);
             }
         }
 
@@ -148,10 +152,7 @@ public class AdminController {
         Optional<Author> authorOptional = authorRepository.findById(authorID);
         if(authorOptional.isPresent()){
                 Author author = authorOptional.get();
-                author.setName(authorName);
-                author.setMoreInfo(authorInfo);
-                author.setMostKnownFor(authorKnownFor);
-                authorRepository.save(author);
+                authorDetails(authorName, authorKnownFor, authorInfo, author);
         }
 
         return "redirect:/authors";
