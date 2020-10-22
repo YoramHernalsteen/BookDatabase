@@ -1,5 +1,7 @@
 package be.thomasmore.bookdb.controller;
 
+import be.thomasmore.bookdb.AuthorForm;
+import be.thomasmore.bookdb.BookForm;
 import be.thomasmore.bookdb.model.Author;
 import be.thomasmore.bookdb.model.Book;
 import be.thomasmore.bookdb.model.Genre;
@@ -30,36 +32,31 @@ public class AdminController {
         return "admin/create-book";
     }
     @PostMapping({"/create-book"})
-    public String createBookPost(@RequestParam String bookTitle,
-                                 @RequestParam(required = false)String bookIsbn,
-                                 @RequestParam String bookAuthor,
-                                 @RequestParam String bookGenre,
-                                 @RequestParam int bookPages,
-                                 @RequestParam String bookRead,
+    public String createBookPost(@ModelAttribute BookForm bookForm,
                                  Model model) {
-        Optional<Book> bookOptional = bookRepository.findByTitleLike(bookTitle);
-        Optional<Genre> genreOptional =genreRepository.findByGenreNameLike(bookGenre);
-        Optional<Author> authorOptional = authorRepository.findByNameLike(bookAuthor);
+        Optional<Book> bookOptional = bookRepository.findByTitleLike(bookForm.getBookTitle());
+        Optional<Genre> genreOptional =genreRepository.findByGenreNameLike(bookForm.getBookGenre());
+        Optional<Author> authorOptional = authorRepository.findByNameLike(bookForm.getBookAuthor());
         if(!bookOptional.isPresent()){
-            if(bookTitle!= null && bookAuthor!= null && bookGenre!= null ){
+            if(bookForm.getBookTitle()!= null && bookForm.getBookAuthor()!= null && bookForm.getBookGenre()!= null ){
                 Book book = new Book();
-                bookDetails(book, bookTitle, bookIsbn, bookPages, genreOptional, authorOptional, bookRead);
+                bookDetails(book, genreOptional, authorOptional, bookForm);
             }
         }
         return "redirect:/books";
     }
 
-    private void bookDetails(Book book, String bookTitle, String bookIsbn, int bookPages,Optional <Genre> genreOptional, Optional<Author> authorOptional, String bookRead ){
-        book.setTitle(bookTitle);
+    private void bookDetails(Book book,Optional <Genre> genreOptional, Optional<Author> authorOptional, BookForm bookForm){
+        book.setTitle(bookForm.getBookTitle());
         if(authorOptional.isPresent()){
             book.setAuthor(authorOptional.get());
         }
         if (genreOptional.isPresent()) {
             book.setGenre(genreOptional.get());
         }
-        book.setIsbn(bookIsbn);
-        book.setReadFromString(bookRead);
-        book.setPages(bookPages);
+        book.setIsbn(bookForm.getBookIsbn());
+        book.setReadFromString(bookForm.getBookRead());
+        book.setPages(bookForm.getBookPages());
         bookRepository.save(book);
     }
 
@@ -87,28 +84,22 @@ public class AdminController {
         return "admin/edit-book";
     }
     @PostMapping("/edit-book/{bookID}")
-    public String postEditBook(@PathVariable(required = false) int bookID,
-                               @RequestParam String bookTitle,
-                               @RequestParam String bookIsbn,
-                               @RequestParam String bookAuthor,
-                               @RequestParam String bookGenre,
-                               @RequestParam int bookPages,
-                               @RequestParam String bookRead){
+    public String postEditBook(@PathVariable(required = false) int bookID, @ModelAttribute BookForm bookForm ){
 
         Optional<Book> bookOptional = bookRepository.findById(bookID);
-        Optional<Genre> genreOptional = genreRepository.findByGenreNameLike(bookGenre);
-        Optional<Author> authorOptional = authorRepository.findByNameLike(bookAuthor);
+        Optional<Genre> genreOptional = genreRepository.findByGenreNameLike(bookForm.getBookGenre());
+        Optional<Author> authorOptional = authorRepository.findByNameLike(bookForm.getBookAuthor());
         if(bookOptional.isPresent()){
             Book book = bookOptional.get();
-            bookDetails(book, bookTitle, bookIsbn, bookPages, genreOptional, authorOptional, bookRead);
+            bookDetails(book, genreOptional, authorOptional,bookForm);
         }
         return "redirect:/book/"+bookID;
     }
 
-    private void authorDetails(String authorName, String authorKnownFor, String authorInfo, Author author){
-        author.setName(authorName);
-        author.setMoreInfo(authorInfo);
-        author.setMostKnownFor(authorKnownFor);
+    private void authorDetails(AuthorForm authorForm, Author author){
+        author.setName(authorForm.getAuthorName());
+        author.setMoreInfo(authorForm.getAuthorInfo());
+        author.setMostKnownFor(authorForm.getAuthorKnownFor());
         authorRepository.save(author);
     }
 
@@ -116,16 +107,14 @@ public class AdminController {
     public String createAuthor(Model model){
         return "admin/create-author";
     }
+
     @PostMapping({"/create-author"})
-    public String createAuthorPost(@RequestParam String authorName,
-                                   @RequestParam String authorKnownFor,
-                                   @RequestParam String authorInfo,
-                                   Model model) {
-        Optional<Author> authorOptional = authorRepository.findByNameLike(authorName);
+    public String createAuthorPost(@ModelAttribute AuthorForm authorForm, Model model) {
+        Optional<Author> authorOptional = authorRepository.findByNameLike(authorForm.getAuthorName());
         if(!authorOptional.isPresent()){
-            if(authorName!= null && authorKnownFor!= null && authorInfo != null){
+            if(authorForm.getAuthorName()!= null && authorForm.getAuthorKnownFor()!= null && authorForm.getAuthorInfo() != null){
                 Author author = new Author();
-                authorDetails(authorName, authorKnownFor, authorInfo, author);
+                authorDetails(authorForm,  author);
             }
         }
 
@@ -144,18 +133,15 @@ public class AdminController {
     }
 
     @PostMapping({"/edit-author/{authorID}"})
-    public String editAuthorPost(  @PathVariable(required = false) int authorID,
-                                   @RequestParam String authorName,
-                                   @RequestParam String authorKnownFor,
-                                   @RequestParam String authorInfo,
+    public String editAuthorPost(  @PathVariable(required = false) int authorID, @ModelAttribute AuthorForm authorForm,
                                    Model model) {
         Optional<Author> authorOptional = authorRepository.findById(authorID);
         if(authorOptional.isPresent()){
                 Author author = authorOptional.get();
-                authorDetails(authorName, authorKnownFor, authorInfo, author);
+                authorDetails(authorForm, author);
         }
 
-        return "redirect:/authors"+authorID;
+        return "redirect:/author/"+authorID;
     }
     @GetMapping("/create-genre")
     public String createGenre(Model model){
