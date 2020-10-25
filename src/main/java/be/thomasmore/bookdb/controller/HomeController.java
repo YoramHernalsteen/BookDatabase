@@ -99,6 +99,7 @@ public class HomeController {
         return "advancedSearch";
     }
     private Integer setMax(String size){
+        Map<String, Integer> mapSize = Map.of("150", 150, "300", 300, "450", 450, "600", 600 , "750", 750, "all", 5000 );
         return mapSize.get(size);
     }
 
